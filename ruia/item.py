@@ -52,7 +52,7 @@ class Item(metaclass=ItemMeta):
             ValueError("html(url or html_etree) is expected")
 
     @classmethod
-    async def _parse_html(cls, *, html_etree: etree._Element):
+    async def _parse_html(cls, *, url='', html_etree: etree._Element):
         if html_etree is None:
             raise ValueError("html_etree is expected")
         item_ins = cls()
@@ -60,7 +60,7 @@ class Item(metaclass=ItemMeta):
         for field_name, field_value in fields_dict.items():
             if not field_name.startswith("target_"):
                 clean_method = getattr(item_ins, f"clean_{field_name}", None)
-                value = field_value.extract(html_etree)
+                value = field_value.extract(html_etree, url=url)
                 if clean_method is not None and callable(clean_method):
                     try:
                         aws_clean_func = clean_method(value)
@@ -89,7 +89,7 @@ class Item(metaclass=ItemMeta):
         if html_etree is None:
             html_etree = await cls._get_html(html, url, **kwargs)
 
-        return await cls._parse_html(html_etree=html_etree)
+        return await cls._parse_html(url=url, html_etree=html_etree)
 
     @classmethod
     async def get_items(
@@ -106,6 +106,7 @@ class Item(metaclass=ItemMeta):
         if items_field:
             items_field.many = True
             items_html_etree = items_field.extract(
+                url=url,
                 html_etree=html_etree, is_source=True
             )
             if items_html_etree:

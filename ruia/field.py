@@ -61,7 +61,7 @@ class _LxmlElementField(BaseField):
     def _parse_element(self, element):
         raise NotImplementedError
 
-    def extract(self, html_etree: etree._Element, is_source: bool = False):
+    def extract(self, html_etree: etree._Element, is_source: bool = False, url=''):
         elements = self._get_elements(html_etree=html_etree)
 
         if is_source:
@@ -72,7 +72,7 @@ class _LxmlElementField(BaseField):
         elif self.default is None:
             raise NothingMatchedError(
                 f"Extract `{self.css_select or self.xpath_select}` error, "
-                f"please check selector or set parameter named `default`"
+                f"please check selector or set parameter named `default`, {url}"
             )
         else:
             results = [self.default]
