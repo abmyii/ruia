@@ -5,7 +5,7 @@ from ruia import Item, TextField, AttrField
 
 
 class PythonDocumentationItem(Item):
-    title = TextField(css_select="title")
+    title = TextField(css_select="titlez")
     tutorial_link = AttrField(xpath_select="//a[text()='Tutorial']", attr="href")
 
 

@@ -5,7 +5,7 @@ from typing import Any
 
 from lxml import etree
 
-from ruia.exceptions import IgnoreThisItem, InvalidFuncType
+from ruia.exceptions import IgnoreThisItem, InvalidFuncType, NothingMatchedError
 from ruia.field import BaseField
 from ruia.request import Request
 
@@ -90,7 +90,11 @@ class Item(metaclass=ItemMeta):
         if html_etree is None:
             html_etree = await cls._get_html(html, url, **kwargs)
 
-        return await cls._parse_html(html_etree=html_etree)
+        try:
+            return await cls._parse_html(html_etree=html_etree)
+        except NothingMatchedError as e:
+            e.args = (f"{e.args[0]}, error url: {url}",) + e.args[1:]
+            raise
 
     @classmethod
     async def get_items(
